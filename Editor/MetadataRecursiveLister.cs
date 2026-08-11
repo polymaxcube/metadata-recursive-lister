@@ -24,15 +24,28 @@ namespace Polymaxcube.MetadataRecursiveLister.Editor
         private int lastNodeCount;
         private int lastMetadataCount;
 
+        private const string IconPath =
+            "Packages/com.polymaxcube.metadatarecursivelister/Editor/Icons/MetadataListerIcon.png";
+
+        private const int ContentPaddingLeft = 14;
+        private const int ContentPaddingRight = 14;
+        private const int ContentPaddingTop = 10;
+        private const int ContentPaddingBottom = 12;
+
+        private GUIStyle contentPaddingStyle;
+
         [MenuItem("Tools/Metadata Recursive Lister")]
         public static void ShowWindow()
         {
-            var window = GetWindow<MetadataRecursiveLister>("Metadata Lister");
+            var window = GetWindow<MetadataRecursiveLister>();
             window.minSize = new Vector2(420, 360);
+            window.ApplyWindowIcon();
         }
 
         private void OnEnable()
         {
+            ApplyWindowIcon();
+
             if (string.IsNullOrEmpty(outputFolder))
                 outputFolder = Path.Combine(Application.dataPath, "CAD_Output", "Metadata");
 
@@ -40,20 +53,48 @@ namespace Polymaxcube.MetadataRecursiveLister.Editor
                 rootObject = Selection.activeGameObject;
         }
 
+        private void ApplyWindowIcon()
+        {
+            var icon = AssetDatabase.LoadAssetAtPath<Texture2D>(IconPath);
+            titleContent = icon != null
+                ? new GUIContent("Metadata Lister", icon)
+                : new GUIContent("Metadata Lister");
+        }
+
         private void OnSelectionChange()
         {
             Repaint();
         }
 
+        private void EnsureStyles()
+        {
+            if (contentPaddingStyle != null)
+                return;
+
+            contentPaddingStyle = new GUIStyle
+            {
+                padding = new RectOffset(
+                    ContentPaddingLeft,
+                    ContentPaddingRight,
+                    ContentPaddingTop,
+                    ContentPaddingBottom)
+            };
+        }
+
         private void OnGUI()
         {
+            EnsureStyles();
+
+            EditorGUILayout.BeginVertical(contentPaddingStyle);
+
             GUILayout.Label("Recursive Metadata Lister", EditorStyles.boldLabel);
+            EditorGUILayout.Space(4);
             EditorGUILayout.HelpBox(
                 "Walks the full hierarchy under the root, collects Metadata on every node, " +
                 "and writes a combined JSON to the output folder.",
                 MessageType.Info);
 
-            EditorGUILayout.Space(6);
+            EditorGUILayout.Space(10);
 
             rootObject = (GameObject)EditorGUILayout.ObjectField(
                 "Root GameObject",
@@ -61,7 +102,8 @@ namespace Polymaxcube.MetadataRecursiveLister.Editor
                 typeof(GameObject),
                 true);
 
-            if (GUILayout.Button("Use Current Selection"))
+            EditorGUILayout.Space(4);
+            if (GUILayout.Button("Use Current Selection", GUILayout.Height(22)))
             {
                 if (Selection.activeGameObject != null)
                     rootObject = Selection.activeGameObject;
@@ -69,12 +111,12 @@ namespace Polymaxcube.MetadataRecursiveLister.Editor
                     EditorUtility.DisplayDialog("No Selection", "Select a GameObject in the Scene or Hierarchy.", "OK");
             }
 
-            EditorGUILayout.Space(6);
+            EditorGUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Output Folder");
             outputFolder = EditorGUILayout.TextField(outputFolder);
-            if (GUILayout.Button("Browse…", GUILayout.Width(80)))
+            if (GUILayout.Button("Browse…", GUILayout.Width(80), GUILayout.Height(20)))
             {
                 string picked = EditorUtility.OpenFolderPanel(
                     "Choose Metadata Output Folder",
@@ -85,19 +127,22 @@ namespace Polymaxcube.MetadataRecursiveLister.Editor
             }
             EditorGUILayout.EndHorizontal();
 
+            EditorGUILayout.Space(8);
+
             includeNodesWithoutMetadata = EditorGUILayout.Toggle(
                 new GUIContent(
                     "Include Nodes Without Metadata",
                     "When enabled, every hierarchy node is listed. When disabled, only nodes with a Metadata component are exported."),
                 includeNodesWithoutMetadata);
 
+            EditorGUILayout.Space(2);
             writeIndividualFiles = EditorGUILayout.Toggle(
                 new GUIContent(
                     "Write Individual Files",
                     "Also write one JSON file per node (in addition to the combined file)."),
                 writeIndividualFiles);
 
-            EditorGUILayout.Space(10);
+            EditorGUILayout.Space(14);
 
             EditorGUI.BeginDisabledGroup(rootObject == null || string.IsNullOrEmpty(outputFolder));
             if (GUILayout.Button("List & Export All Metadata", GUILayout.Height(36)))
@@ -106,39 +151,44 @@ namespace Polymaxcube.MetadataRecursiveLister.Editor
             }
             EditorGUI.EndDisabledGroup();
 
+            EditorGUILayout.Space(6);
             if (GUILayout.Button("Preview Only (Console + Window)", GUILayout.Height(28)))
             {
                 if (rootObject == null)
                 {
                     EditorUtility.DisplayDialog("Error", "Assign a Root GameObject first.", "OK");
-                    return;
                 }
-
-                var nodes = CollectNodes(rootObject, includeNodesWithoutMetadata);
-                lastNodeCount = nodes.Count;
-                lastMetadataCount = 0;
-                foreach (var n in nodes)
+                else
                 {
-                    if (n.hasMetadata)
-                        lastMetadataCount++;
-                }
+                    var nodes = CollectNodes(rootObject, includeNodesWithoutMetadata);
+                    lastNodeCount = nodes.Count;
+                    lastMetadataCount = 0;
+                    foreach (var n in nodes)
+                    {
+                        if (n.hasMetadata)
+                            lastMetadataCount++;
+                    }
 
-                lastPreview = BuildPreviewText(rootObject.name, nodes);
-                Debug.Log(
-                    $"[Metadata Lister] Preview '{rootObject.name}': {lastNodeCount} node(s), " +
-                    $"{lastMetadataCount} with Metadata.\n{lastPreview}");
+                    lastPreview = BuildPreviewText(rootObject.name, nodes);
+                    Debug.Log(
+                        $"[Metadata Lister] Preview '{rootObject.name}': {lastNodeCount} node(s), " +
+                        $"{lastMetadataCount} with Metadata.\n{lastPreview}");
+                }
             }
 
             if (!string.IsNullOrEmpty(lastPreview))
             {
-                EditorGUILayout.Space(8);
+                EditorGUILayout.Space(12);
                 GUILayout.Label(
                     $"Last preview — nodes: {lastNodeCount}, with Metadata: {lastMetadataCount}",
                     EditorStyles.miniBoldLabel);
+                EditorGUILayout.Space(4);
                 previewScroll = EditorGUILayout.BeginScrollView(previewScroll, GUILayout.MinHeight(120));
                 EditorGUILayout.TextArea(lastPreview, GUILayout.ExpandHeight(true));
                 EditorGUILayout.EndScrollView();
             }
+
+            EditorGUILayout.EndVertical();
         }
 
         public static int Export(
