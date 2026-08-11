@@ -7,9 +7,12 @@
 Unity Editor tool that walks a GameObject hierarchy, collects `Metadata` component properties on every node, and exports them to JSON.
 
 **Package:** `com.polymaxcube.metadatarecursivelister`  
-**Version:** 1.0.1  
+**Version:** 1.0.2  
 **Unity:** 2022.3+  
-**Author:** samiti
+**Author:** samiti  
+**License:** [MIT](LICENSE)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Why use this?
 
@@ -57,6 +60,10 @@ https://github.com/<user>/<repo>.git#v1.0.1
 Copy this folder into your project’s `Packages/` directory (or add it as a local package in the Package Manager).
 
 ## Usage
+
+<p align="center">
+  <img src="Screenshot.png" alt="Metadata Lister Editor window" width="520">
+</p>
 
 1. Open **Tools → Metadata Recursive Lister**
 2. Assign a **Root GameObject** (or click **Use Current Selection**)
@@ -121,4 +128,6 @@ If this tool helps your workflow, you can support development here:
 
 ## License
 
-Specify your preferred license in this repository (e.g. MIT).
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for the full text.
+
+You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of this software, provided the copyright notice and permission notice are included in all copies or substantial portions of the Software.

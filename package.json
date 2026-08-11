@@ -1,9 +1,10 @@
 {
   "name": "com.polymaxcube.metadatarecursivelister",
   "displayName": "Metadata Recursive Lister",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "unity": "2022.3",
   "description": "Metadata Recursive Lister package for Unity",
+  "license": "MIT",
   "icon": "Editor/Icons/MetadataListerIcon.png",
   "keywords": [
     "upm",
