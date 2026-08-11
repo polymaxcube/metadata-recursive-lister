@@ -24,6 +24,7 @@ This tool gives you a fast, Editor-native way to:
 - **Export Metadata as JSON** — pull `getProperties()` data into a format you can version, share, or feed into pipelines
 - **Validate before you ship** — preview node counts and missing Metadata in the window/Console before writing files
 - **Fit CAD / PLM workflows** — combined or per-part JSON suits documentation, BOM checks, and downstream tools
+- **Prepare data for AI / ML** — structured hierarchy + property JSON can be reused as training or evaluation data (for example part/metadata understanding, scene-graph style datasets, or retrieval corpora). Exact training setups vary by project — this package focuses on clean export
 - **Stay in Unity** — no external app; open from **Tools**, pick a root, choose a folder, export
 
 Use it when you need a reliable snapshot of hierarchy + Metadata instead of clicking through parts one by one.
@@ -73,6 +74,40 @@ Copy this folder into your project’s `Packages/` directory (or add it as a loc
    - **Write Individual Files** — also write one JSON file per node
 5. Click **Preview Only** to inspect the hierarchy, or **List & Export All Metadata** to write files
 
+## How it works
+
+```mermaid
+flowchart TD
+    A[Open Tools → Metadata Recursive Lister] --> B[Set Root GameObject + Output Folder]
+    B --> C{Choose action}
+
+    C -->|Preview Only| D[CollectNodes]
+    C -->|List & Export All Metadata| E[Create output folder]
+    E --> D
+
+    D --> F[Walk full hierarchy under root<br/>GetComponentsInChildren including inactive]
+    F --> G{Node has Metadata component?}
+
+    G -->|Yes| H[Call getProperties via reflection]
+    H --> I[Build NodeRecord<br/>name, path, depth, properties, …]
+    G -->|No| J{Include Nodes Without Metadata?}
+    J -->|No| K[Skip node]
+    J -->|Yes| L[Build NodeRecord with empty properties]
+    L --> I
+    K --> M{More nodes?}
+    I --> M
+    M -->|Yes| F
+    M -->|No| N{Preview or Export?}
+
+    N -->|Preview| O[Show summary in window + Console]
+    N -->|Export| P{Write Individual Files?}
+    P -->|Yes| Q[Write one JSON per node]
+    P -->|No| R[Skip per-node files]
+    Q --> S[Write combined<br/>RootName_all_nodes_metadata.json]
+    R --> S
+    S --> T[AssetDatabase.Refresh + completion dialog]
+```
+
 ## Output
 
 ### Combined file
@@ -115,6 +150,16 @@ Example shape:
 - Scene hierarchy nodes may optionally carry a component named **`Metadata`** with a `getProperties()` method that returns `Dictionary<string, string>`
 
 Nodes without `Metadata` can still be listed when **Include Nodes Without Metadata** is enabled; their `properties` object will be empty.
+
+## Used by
+
+If your website or product uses this package (for example in a CAD / digital-twin pipeline), please let us know — open a GitHub Issue with your project name and URL so we can add it here.
+
+### Example websites
+
+| Project | Website |
+| --- | --- |
+| Srinagarindra 65 Digital Twin — CAD Library | [https://srinakarin-digitaltwins-65.web.app/cad/library](https://srinakarin-digitaltwins-65.web.app/cad/library) |
 
 ## Support
 
