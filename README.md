@@ -1,7 +1,7 @@
 # Metadata Recursive Lister
 
 <p align="center">
-  <img src="docs/banner.png" alt="Metadata Recursive Lister — Unity Editor tool for hierarchy metadata export" width="100%">
+  <img src="Documentation~/banner.png" alt="Metadata Recursive Lister — Unity Editor tool for hierarchy metadata export" width="100%">
 </p>
 
 Unity Editor tool that walks a GameObject hierarchy, collects `Metadata` component properties on every node, and exports them to JSON.
@@ -63,7 +63,7 @@ Copy this folder into your project’s `Packages/` directory (or add it as a loc
 ## Usage
 
 <p align="center">
-  <img src="Screenshot.png" alt="Metadata Lister Editor window" width="520">
+  <img src="Documentation~/Screenshot.png" alt="Metadata Lister Editor window" width="520">
 </p>
 
 1. Open **Tools → Metadata Recursive Lister**
