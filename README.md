@@ -47,13 +47,13 @@ Use it when you need a reliable snapshot of hierarchy + Metadata instead of clic
 3. Paste your repository URL, for example:
 
 ```
-https://github.com/<user>/<repo>.git
+https://github.com/polymaxcube/metadata-recursive-lister.git
 ```
 
 To pin a version/tag:
 
 ```
-https://github.com/<user>/<repo>.git#v1.0.1
+https://github.com/polymaxcube/metadata-recursive-lister.git#v1.0.2
 ```
 
 ### Local / embedded
